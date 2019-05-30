@@ -1,16 +1,13 @@
+using namespace Eigen;
+using namespace std;
+
 #include <cstdio>
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <deque>
 #include <eigen3/Eigen/Dense>
-
-using namespace Eigen;
-using namespace std;
-
-MatrixXd I(int size)
-{
-  return MatrixXd::Identity(size, size);
-}
+#include "utils.h"
 
 /* ----------
 This function should return two vectors, s_k and y_k where:
@@ -19,28 +16,29 @@ y_k = x_k / t, ∀_k->n
 ---------- */
 std::tuple<VectorXd, VectorXd> s(VectorXd x_i, int n)
 {
-  double s_0 = x_i[0];
-  double t = s_0;
-  double running_sum = s_0 * s_0;
+  double s_n = x_i[n - 1];
+  double t = s_n;
+  double backward_running_sum = s_n * s_n;
 
-  vector<double> S{sqrt(s_0 * s_0)};
-  vector<double> y{s_0 / t};
+  deque<double> S{sqrt(backward_running_sum)};
+  deque<double> y{s_n / t};
 
-  for (int k = 1; k++; k < n)
+  for (int k = n; k > 0; k--)
   {
     double toAdd = x_i[k] * x_i[k];
-    double newSum = toAdd + running_sum;
+    double newSum = toAdd + backward_running_sum;
 
-    running_sum = newSum;
+    backward_running_sum = newSum;
 
-    S.push_back(newSum);
-    y.push_back(x_i[k] / t);
+    S.push_front(newSum);
+    y.push_front(x_i[k] / t);
   }
 
-  VectorXd yk(y.data());
-  VectorXd sk(S.data());
+  VectorXd y_k(deque_to_vec(y).data());
+  VectorXd summatory(deque_to_vec(S).data());
+  VectorXd s_k = 1 / t * summatory;
 
-  return std::make_tuple(sk, yk);
+  return std::make_tuple(s_k, y_k);
 }
 
 MatrixXd computeH(int n, VectorXd S)

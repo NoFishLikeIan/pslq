@@ -1,7 +1,8 @@
 #include "pslq.h"
+#include <cstdio>
 
 int main()
 {
-  int test = 3;
+  printf("Hello world");
   return 0;
 }

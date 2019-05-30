@@ -5,6 +5,5 @@
 using namespace Eigen;
 
 void psql(int n);
-MatrixXd I(int size);
 
 #endif
