@@ -12,18 +12,31 @@ MatrixXd I(int size)
   return MatrixXd::Identity(size, size);
 }
 
+/* ----------
+This function should return two vectors, s_k and y_k where:
+s_k = sqrt( Σ_k->n x_j * x_j ) / s_1
+y_k = x_k / t, ∀_k->n
+---------- */
 std::tuple<VectorXd, VectorXd> s(VectorXd x_i, int n)
 {
-  double S_init = x_i[0];
-  double t = S_init;
-  vector<double> S(S_init);
-  vector<double> y{S_init / t};
+  double s_0 = x_i[0];
+  double t = s_0;
+  double running_sum = s_0 * s_0;
+
+  vector<double> S{sqrt(s_0 * s_0)};
+  vector<double> y{s_0 / t};
+
   for (int k = 1; k++; k < n)
   {
-    S.push_back(sqrt(x_i[k]));
+    double toAdd = x_i[k] * x_i[k];
+    double newSum = toAdd + running_sum;
+
+    running_sum = newSum;
+
+    S.push_back(newSum);
     y.push_back(x_i[k] / t);
   }
-  // FIXME: Not correct implementation
+
   VectorXd yk(y.data());
   VectorXd sk(S.data());
 
