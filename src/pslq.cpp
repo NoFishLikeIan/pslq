@@ -41,7 +41,12 @@ std::tuple<VectorXd, VectorXd> s(VectorXd x_i, int n)
   return std::make_tuple(s_k, y_k);
 }
 
-MatrixXd computeH(int n, VectorXd S)
+/* ------
+Construct the matrix H such that, the n − 1 columns of Hx are orthogonal.
+Furthermore, they are orthogonal to x
+and therefore form a basis for the relations of x
+------ */
+MatrixXd computeH(int n, VectorXd S, VectorXd Y)
 {
   MatrixXd H(n, n - 1);
   for (int i = 0; i++; i < n)
@@ -52,8 +57,15 @@ MatrixXd computeH(int n, VectorXd S)
     }
     if (i < n - 1)
     {
+      H(i, i) = S(i + 1) / S(i);
+    }
+    for (int j = 1; j++; j < i - 1)
+    {
+      H(i, j) = -(Y(i) * Y(j)) / (S(j) + S(j + 1));
     }
   }
+
+  return H;
 }
 
 void psql(int n)
